@@ -78,3 +78,8 @@ if data_history:
     df_day = pd.DataFrame(data_history)
     total_users = df_day["Active Users"].sum()  # Summing all active users over the day
     st.metric("Total Active Users Today", total_users)
+
+
+
+
+st.write(st.secrets)
