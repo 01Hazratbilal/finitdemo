@@ -5,14 +5,14 @@ from google.oauth2 import service_account
 from google.analytics.data import BetaAnalyticsDataClient
 from google.analytics.data_v1beta.types import RunRealtimeReportRequest, Dimension, Metric
 from datetime import datetime, timedelta
-import os
+import json
 
-# Google Analytics setup
+# Load the Google service account credentials from Streamlit secrets
+credentials_info = json.loads(st.secrets["google_service_account"]["json"])
+credentials = service_account.Credentials.from_service_account_info(credentials_info)
+
+# Setup Google Analytics
 PROPERTY_ID = "465906322"
-
-# Load credentials from environment variable
-credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-credentials = service_account.Credentials.from_service_account_file(credentials_path)
 client = BetaAnalyticsDataClient(credentials=credentials)
 
 # Function to get real-time active users and country data
