@@ -11,4 +11,3 @@ PROPERTY_ID = "465906322"
 
 import json
 st.write(st.seccrets)
-credentials_info = json.loads(st.secrets["GOOGLE_APPLICATION_CREDENTIALS"])
