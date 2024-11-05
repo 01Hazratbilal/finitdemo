@@ -5,6 +5,10 @@ from google.oauth2 import service_account
 from google.analytics.data import BetaAnalyticsDataClient
 from google.analytics.data_v1beta.types import RunRealtimeReportRequest, Dimension, Metric
 from datetime import datetime, timedelta
+import os
+
+# Set environment variable for Google credentials
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "new1-440719-2ed76e73a52f.json"
 
 # Google Analytics setup
 PROPERTY_ID = "465906322"
@@ -16,20 +20,25 @@ client = BetaAnalyticsDataClient(credentials=credentials)
 
 # Function to get real-time active users and country data
 def get_realtime_active_users():
-    request = RunRealtimeReportRequest(
-        property=f"properties/{PROPERTY_ID}",
-        dimensions=[Dimension(name="country")],
-        metrics=[Metric(name="activeUsers")],
-    )
-    response = client.run_realtime_report(request)
+    try:
+        request = RunRealtimeReportRequest(
+            property=f"properties/{PROPERTY_ID}",
+            dimensions=[Dimension(name="country")],
+            metrics=[Metric(name="activeUsers")],
+        )
+        response = client.run_realtime_report(request)
 
-    user_data = []
-    for row in response.rows:
-        country = row.dimension_values[0].value
-        active_users = int(row.metric_values[0].value)
-        user_data.append({"Country": country, "Active Users": active_users, "Timestamp": datetime.now()})
+        user_data = []
+        for row in response.rows:
+            country = row.dimension_values[0].value
+            active_users = int(row.metric_values[0].value)
+            user_data.append({"Country": country, "Active Users": active_users, "Timestamp": datetime.now()})
 
-    return user_data
+        return user_data
+
+    except Exception as e:
+        st.error(f"Error fetching data: {e}")
+        return []
 
 # Store data history for the last 30 minutes
 data_history = []
