@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 import json
 
 # Google Analytics setup
-PROPERTY_ID = st.secrets["PROPERTY_ID"]
+PROPERTY_ID = "465906322"
 
 # Authentication using secrets
 google_credentials = st.secrets["GOOGLE_CREDENTIALS"]
