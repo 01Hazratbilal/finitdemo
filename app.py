@@ -1,4 +1,4 @@
-import streamlit as st
+import streamlit as st  # Make sure to import the Streamlit library
 
 def main():
     # Check if GOOGLE_CREDENTIALS is available
