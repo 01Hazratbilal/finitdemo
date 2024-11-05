@@ -1,51 +1,30 @@
-import os
-import json
+import streamlit as st
+import pandas as pd
+import plotly.express as px
 from google.oauth2 import service_account
 from google.analytics.data import BetaAnalyticsDataClient
-import streamlit as st
 from google.analytics.data_v1beta.types import RunRealtimeReportRequest, Dimension, Metric
-from datetime import datetime
+import os
+from datetime import datetime, timedelta
 
+# Google Analytics setup
 PROPERTY_ID = "465906322"
 
-# Load credentials from environment variable
-@st.cache_resource
-def load_credentials():
-    credentials_json = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS_JSON')
-    if credentials_json is None:
-        st.error("Google credentials are not set in the environment variables.")
-        return None
-    try:
-        credentials_info = json.loads(credentials_json)
-        return service_account.Credentials.from_service_account_info(credentials_info)
-    except json.JSONDecodeError:
-        st.error("Failed to decode Google credentials JSON.")
-        return None
+# Load credentials from GitHub secrets
+json_credentials = st.secrets["GOOGLE_CREDENTIALS"]
 
 # Authentication
-credentials = load_credentials()
-if credentials:
-    client = BetaAnalyticsDataClient(credentials=credentials)
-else:
-    st.error("Failed to load credentials. Check your configuration.")
+credentials = service_account.Credentials.from_service_account_info(json_credentials)
+client = BetaAnalyticsDataClient(credentials=credentials)
 
-# Function to get real-time active users
+# Function to get real-time active users and country data
 def get_realtime_active_users():
-    if 'client' not in locals():
-        st.error("Client not initialized. Check credentials.")
-        return []
-    
     request = RunRealtimeReportRequest(
         property=f"properties/{PROPERTY_ID}",
         dimensions=[Dimension(name="country")],
         metrics=[Metric(name="activeUsers")],
     )
-    
-    try:
-        response = client.run_realtime_report(request)
-    except Exception as e:
-        st.error(f"Error fetching data: {e}")
-        return []
+    response = client.run_realtime_report(request)
 
     user_data = []
     for row in response.rows:
@@ -55,8 +34,48 @@ def get_realtime_active_users():
 
     return user_data
 
-# Streamlit app layout
+# Store data history for the last 30 minutes
+data_history = []
+
 st.title("Real-Time Active Users by Country")
+
+# Refresh data manually
 if st.button("Refresh Data"):
+    # Fetch new data
     new_data = get_realtime_active_users()
-    st.write(new_data)
+
+    # Append new data to history
+    data_history.extend(new_data)
+
+    # Filter history to only keep data from the last 30 minutes
+    cutoff = datetime.now() - timedelta(minutes=30)
+    data_history = [entry for entry in data_history if entry["Timestamp"] >= cutoff]
+
+    # Convert history to DataFrame
+    df = pd.DataFrame(data_history)
+
+    if not df.empty:
+        # Main Graph: Bar chart showing active users per country in the last 30 minutes
+        fig_bar = px.bar(df, x="Country", y="Active Users", color="Country",
+                         title="Active Users by Country Over the Last 30 Minutes",
+                         labels={"Active Users": "Active Users"}, height=400)
+        st.plotly_chart(fig_bar, use_container_width=True)
+
+        # Secondary Graph: Histogram for active users in the last 5 minutes
+        cutoff_5min = datetime.now() - timedelta(minutes=5)
+        recent_data = df[df["Timestamp"] >= cutoff_5min]
+        if not recent_data.empty:
+            fig_hist = px.histogram(recent_data, x="Country", y="Active Users",
+                                    color="Country", title="Active Users in the Last 5 Minutes by Country",
+                                    labels={"Active Users": "Active Users"}, height=400)
+            st.plotly_chart(fig_hist, use_container_width=True)
+        else:
+            st.write("No active users data in the last 5 minutes.")
+    else:
+        st.write("No active user data available for the last 30 minutes.")
+
+# Add a metric for the total number of unique active users throughout the day
+if data_history:
+    df_day = pd.DataFrame(data_history)
+    total_users = df_day["Active Users"].sum()  # Summing all active users over the day
+    st.metric("Total Active Users Today", total_users)
