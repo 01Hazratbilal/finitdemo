@@ -5,17 +5,15 @@ from google.oauth2 import service_account
 from google.analytics.data import BetaAnalyticsDataClient
 from google.analytics.data_v1beta.types import RunRealtimeReportRequest, Dimension, Metric
 from datetime import datetime, timedelta
-import json  # Import json
+import json
 
-# Load Google Analytics property ID and JSON credentials from secrets
-PROPERTY_ID = st.secrets["general"]["PROPERTY_ID"]
-GOOGLE_CREDENTIALS = st.secrets["general"]["GOOGLE_CREDENTIALS"]
+# Google Analytics setup
+PROPERTY_ID = st.secrets["PROPERTY_ID"]
 
-# Convert the string to a dictionary
-json_credentials = json.loads(GOOGLE_CREDENTIALS)
-
-# Authentication
-credentials = service_account.Credentials.from_service_account_info(json_credentials)
+# Authentication using secrets
+google_credentials = st.secrets["GOOGLE_CREDENTIALS"]
+credentials_info = json.loads(google_credentials)  # Parse the JSON string
+credentials = service_account.Credentials.from_service_account_info(credentials_info)
 client = BetaAnalyticsDataClient(credentials=credentials)
 
 # Function to get real-time active users and country data
@@ -34,18 +32,6 @@ def get_realtime_active_users():
         user_data.append({"Country": country, "Active Users": active_users, "Timestamp": datetime.now()})
 
     return user_data
-
-# Embed Google Analytics tracking code
-GA_TRACKING_ID = st.secrets["GA_TRACKING_ID"]  # Ensure this is also in your secrets.toml
-st.markdown(f"""
-<script async src="https://www.googletagmanager.com/gtag/js?id={GA_TRACKING_ID}"></script>
-<script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){{dataLayer.push(arguments);}}
-gtag('js', new Date());
-gtag('config', '{GA_TRACKING_ID}');
-</script>
-""", unsafe_allow_html=True)
 
 # Store data history for the last 30 minutes
 data_history = []
