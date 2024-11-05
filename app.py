@@ -5,13 +5,17 @@ from google.oauth2 import service_account
 from google.analytics.data import BetaAnalyticsDataClient
 from google.analytics.data_v1beta.types import RunRealtimeReportRequest, Dimension, Metric
 from datetime import datetime, timedelta
+import json  # Import json
 
 # Load Google Analytics property ID and JSON credentials from secrets
 PROPERTY_ID = st.secrets["general"]["PROPERTY_ID"]
 GOOGLE_CREDENTIALS = st.secrets["general"]["GOOGLE_CREDENTIALS"]
 
+# Convert the string to a dictionary
+json_credentials = json.loads(GOOGLE_CREDENTIALS)
+
 # Authentication
-credentials = service_account.Credentials.from_service_account_info(JSON_FILE)
+credentials = service_account.Credentials.from_service_account_info(json_credentials)
 client = BetaAnalyticsDataClient(credentials=credentials)
 
 # Function to get real-time active users and country data
@@ -32,7 +36,7 @@ def get_realtime_active_users():
     return user_data
 
 # Embed Google Analytics tracking code
-GA_TRACKING_ID = st.secrets["GA_TRACKING_ID"]  # Add this to your secrets.toml
+GA_TRACKING_ID = st.secrets["GA_TRACKING_ID"]  # Ensure this is also in your secrets.toml
 st.markdown(f"""
 <script async src="https://www.googletagmanager.com/gtag/js?id={GA_TRACKING_ID}"></script>
 <script>
