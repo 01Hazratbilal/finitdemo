@@ -23,10 +23,13 @@ SERVICE_ACCOUNT_INFO = {
     "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/once-92%40new1-440719.iam.gserviceaccount.com",
     "universe_domain": "googleapis.com"
   }
+  
 
-
-# Authentication using embedded JSON data
-credentials = service_account.Credentials.from_service_account_info(SERVICE_ACCOUNT_INFO)
+# Authentication using embedded JSON data and specifying scopes
+credentials = service_account.Credentials.from_service_account_info(
+    SERVICE_ACCOUNT_INFO,
+    scopes=["https://www.googleapis.com/auth/analytics.readonly"]
+)
 client = BetaAnalyticsDataClient(credentials=credentials)
 
 # Function to get real-time active users and country data
@@ -48,7 +51,6 @@ def get_realtime_active_users():
 
 # Store data history for the last 30 minutes
 data_history = []
-
 
 st.title("Real-Time Active Users by Country")
 
