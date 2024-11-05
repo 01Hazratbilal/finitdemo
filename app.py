@@ -8,11 +8,14 @@ from datetime import datetime, timedelta
 
 # Google Analytics setup
 PROPERTY_ID = "465906322"
-JSON_FILE = "./new1-440719-3478539f268c.json"
 
-# Authentication
-credentials = service_account.Credentials.from_service_account_file(JSON_FILE)
-client = BetaAnalyticsDataClient(credentials=credentials)
+# Load credentials from the JSON file
+@st.cache_resource
+def load_credentials():
+    json_file_path = "new1-440719-96e84b018533.json"  # Update this if your path is different
+    with open(json_file_path, 'r') as json_file:
+        credentials_info = json.load(json_file)
+    return service_account.Credentials.from_service_account_info(credentials_info)
 
 # Function to get real-time active users and country data
 def get_realtime_active_users():
