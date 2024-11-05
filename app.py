@@ -7,8 +7,8 @@ from google.analytics.data_v1beta.types import RunRealtimeReportRequest, Dimensi
 from datetime import datetime, timedelta
 
 # Load Google Analytics property ID and JSON credentials from secrets
-PROPERTY_ID = st.secrets["PROPERTY_ID"]  # Ensure this is defined in your secrets.toml
-JSON_FILE = st.secrets["GOOGLE_CREDENTIALS"]  # Assuming you've stored your JSON credentials here
+PROPERTY_ID = st.secrets["general"]["PROPERTY_ID"]
+GOOGLE_CREDENTIALS = st.secrets["general"]["GOOGLE_CREDENTIALS"]
 
 # Authentication
 credentials = service_account.Credentials.from_service_account_info(JSON_FILE)
