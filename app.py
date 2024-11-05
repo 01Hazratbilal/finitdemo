@@ -16,3 +16,4 @@ except json.JSONDecodeError:
 except Exception as e:
     st.error(f"An error occurred: {e}")
     st.stop()
+print(st.secrets)
