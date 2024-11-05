@@ -10,4 +10,4 @@ from datetime import datetime, timedelta
 PROPERTY_ID = "465906322"
 
 import json
-st.write(st.seccrets)
+st.write(st.secrets)
