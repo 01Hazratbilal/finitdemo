@@ -11,15 +11,22 @@ import json
 PROPERTY_ID = "465906322"
 
 # Load credentials from Streamlit secrets
-private_key = st.secrets["google"]["private_key"]
-client_email = st.secrets["google"]["client_email"]
+creds_dict = {
+    "type": st.secrets["gcp"]["type"],
+    "project_id": st.secrets["gcp"]["project_id"],
+    "private_key_id": st.secrets["gcp"]["private_key_id"],
+    "private_key": st.secrets["gcp"]["private_key"].replace('\\n', '\n'),  # Handle newlines properly
+    "client_email": st.secrets["gcp"]["client_email"],
+    "client_id": st.secrets["gcp"]["client_id"],
+    "auth_uri": st.secrets["gcp"]["auth_uri"],
+    "token_uri": st.secrets["gcp"]["token_uri"],
+    "auth_provider_x509_cert_url": st.secrets["gcp"]["auth_provider_x509_cert_url"],
+    "client_x509_cert_url": st.secrets["gcp"]["client_x509_cert_url"],
+    "universe_domain": st.secrets["gcp"]["universe_domain"],
+}
 
-# Create credentials using the private key and client email
-credentials = service_account.Credentials.from_service_account_info({
-    "type": "service_account",
-    "private_key": private_key,
-    "client_email": client_email,
-})
+# Authentication
+credentials = service_account.Credentials.from_service_account_info(creds_dict)
 client = BetaAnalyticsDataClient(credentials=credentials)
 
 # Function to get real-time active users and country data
