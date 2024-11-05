@@ -5,28 +5,13 @@ from google.oauth2 import service_account
 from google.analytics.data import BetaAnalyticsDataClient
 from google.analytics.data_v1beta.types import RunRealtimeReportRequest, Dimension, Metric
 from datetime import datetime, timedelta
-import json
 
 # Google Analytics setup
 PROPERTY_ID = "465906322"
-
-# Load credentials from Streamlit secrets
-creds_dict = {
-    "type": st.secrets["gcp"]["type"],
-    "project_id": st.secrets["gcp"]["project_id"],
-    "private_key_id": st.secrets["gcp"]["private_key_id"],
-    "private_key": st.secrets["gcp"]["private_key"].replace('\\n', '\n'),  # Handle newlines properly
-    "client_email": st.secrets["gcp"]["client_email"],
-    "client_id": st.secrets["gcp"]["client_id"],
-    "auth_uri": st.secrets["gcp"]["auth_uri"],
-    "token_uri": st.secrets["gcp"]["token_uri"],
-    "auth_provider_x509_cert_url": st.secrets["gcp"]["auth_provider_x509_cert_url"],
-    "client_x509_cert_url": st.secrets["gcp"]["client_x509_cert_url"],
-    "universe_domain": st.secrets["gcp"]["universe_domain"],
-}
+JSON_FILE = "new1-440719-3478539f268c.json"
 
 # Authentication
-credentials = service_account.Credentials.from_service_account_info(creds_dict)
+credentials = service_account.Credentials.from_service_account_file(JSON_FILE)
 client = BetaAnalyticsDataClient(credentials=credentials)
 
 # Function to get real-time active users and country data
