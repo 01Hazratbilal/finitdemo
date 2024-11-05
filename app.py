@@ -6,16 +6,59 @@ from google.analytics.data import BetaAnalyticsDataClient
 from google.analytics.data_v1beta.types import RunRealtimeReportRequest, Dimension, Metric
 from datetime import datetime, timedelta
 
+import os
+import json
+from google.oauth2 import service_account
+from google.analytics.data import BetaAnalyticsDataClient
+
 # Google Analytics setup
 PROPERTY_ID = "465906322"
 
-# Load credentials from the JSON file
+# Load credentials from an environment variable
 @st.cache_resource
 def load_credentials():
-    json_file_path = "new1-440719-96e84b018533.json"  # Update this if your path is different
-    with open(json_file_path, 'r') as json_file:
-        credentials_info = json.load(json_file)
+    credentials_json = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS_JSON')
+    if credentials_json is None:
+        st.error("Google credentials are not set in the environment variables.")
+        return None
+    credentials_info = json.loads(credentials_json)
     return service_account.Credentials.from_service_account_info(credentials_info)
+
+# Authentication
+credentials = load_credentials()
+if credentials:
+    client = BetaAnalyticsDataClient(credentials=credentials)
+else:
+    st.error("Failed to load credentials.")
+
+# Function to get real-time active users and country data
+def get_realtime_active_users():
+    if client is None:
+        st.error("Client not initialized. Check credentials.")
+        return []
+
+    request = RunRealtimeReportRequest(
+        property=f"properties/{PROPERTY_ID}",
+        dimensions=[Dimension(name="country")],
+        metrics=[Metric(name="activeUsers")],
+    )
+    
+    try:
+        response = client.run_realtime_report(request)
+    except Exception as e:
+        st.error(f"Error fetching data: {e}")
+        return []
+
+    user_data = []
+    for row in response.rows:
+        country = row.dimension_values[0].value
+        active_users = int(row.metric_values[0].value)
+        user_data.append({"Country": country, "Active Users": active_users, "Timestamp": datetime.now()})
+
+    return user_data
+
+# Streamlit app code continues...
+
 
 # Function to get real-time active users and country data
 def get_realtime_active_users():
