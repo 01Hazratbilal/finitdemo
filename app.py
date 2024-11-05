@@ -5,29 +5,13 @@ from google.oauth2 import service_account
 from google.analytics.data import BetaAnalyticsDataClient
 from google.analytics.data_v1beta.types import RunRealtimeReportRequest, Dimension, Metric
 from datetime import datetime, timedelta
-import json
 
 # Google Analytics setup
 PROPERTY_ID = "465906322"
+JSON_FILE = "new.json"
 
-# Authentication using secrets
-google_credentials = GOOGLE_CREDENTIALS = """
-{
-  "type": "service_account",
-  "project_id": "new1-440719",
-  "private_key_id": "cffbdff96fe6932e6900bbaf40b1641ede593575",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDJcsu1n0R0D1yU\n...\n-----END PRIVATE KEY-----\n"
-  "client_email": "demo-303@new1-440719.iam.gserviceaccount.com",
-  "client_id": "111570280622118416726",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/demo-303%40new1-440719.iam.gserviceaccount.com",
-  "universe_domain": "googleapis.com"
-}
-"""
-credentials_info = json.loads(google_credentials)  # Parse the JSON string
-credentials = service_account.Credentials.from_service_account_info(credentials_info)
+# Authentication
+credentials = service_account.Credentials.from_service_account_file(JSON_FILE)
 client = BetaAnalyticsDataClient(credentials=credentials)
 
 # Function to get real-time active users and country data
@@ -92,8 +76,3 @@ if data_history:
     df_day = pd.DataFrame(data_history)
     total_users = df_day["Active Users"].sum()  # Summing all active users over the day
     st.metric("Total Active Users Today", total_users)
-
-
-
-
-st.write(st.secrets)
