@@ -1,13 +1,9 @@
 import streamlit as st
+import json
 
 # Check if 'gcs_connections' exists in st.secrets
 if "gcs_connections" in st.secrets:
-    st.write("gcs_connections key found!")
-else:
-    st.write("Error: 'gcs_connections' key not found in secrets.")import streamlit as st
-
-# Check if 'gcs_connections' exists in st.secrets
-if "gcs_connections" in st.secrets:
-    st.write("gcs_connections key found!")
+    credentials_info = json.loads(st.secrets["gcs_connections"]["GOOGLE_APPLICATION_CREDENTIALS"])
+    st.write("Credentials loaded successfully!")
 else:
     st.write("Error: 'gcs_connections' key not found in secrets.")
