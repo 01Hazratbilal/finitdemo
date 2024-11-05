@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 import os
 
 # Set environment variable for Google credentials
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "new1-440719-2ed76e73a52f.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./new1-440719-2ed76e73a52f.json"
 
 # Google Analytics setup
 PROPERTY_ID = "465906322"
