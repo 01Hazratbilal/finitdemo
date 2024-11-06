@@ -1,3 +1,5 @@
+import os
+import json
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -11,10 +13,10 @@ st.set_page_config(page_title="Finit Demo Dashboard", layout="wide")
 
 # Google Analytics setup
 PROPERTY_ID = "465906322"
-JSON_FILE = "new.json"
 
 # Authentication
-credentials = service_account.Credentials.from_service_account_file(JSON_FILE)
+credentials_info = json.loads(os.environ.get("google"))  # Parse the JSON from the environment variable
+credentials = service_account.Credentials.from_service_account_info(credentials_info)
 client = BetaAnalyticsDataClient(credentials=credentials)
 
 # Caching the Google Analytics Request for 30 seconds to avoid redundant calls
