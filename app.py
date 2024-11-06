@@ -15,7 +15,7 @@ st.set_page_config(page_title="Finit Demo Dashboard", layout="wide")
 PROPERTY_ID = "465906322"
 
 # Authentication
-credentials_info = json.loads(os.environ.get("google"))  # Parse the JSON from the environment variable
+credentials_info = os.environ.get("google")  # Parse the JSON from the environment variable
 credentials = service_account.Credentials.from_service_account_info(credentials_info)
 client = BetaAnalyticsDataClient(credentials=credentials)
 
